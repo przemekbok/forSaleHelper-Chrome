@@ -74,8 +74,13 @@ function gameState(startCash) {
     close.textContent = ">";
     playersCards.appendChild(close);
     let playersBalance = document.querySelector(`.${player[0]}-balance`);
+    playersBalance.innerHTML = "";
+    let balanceLabel = document.createElement("span");
+    balanceLabel.textContent = "balance:";
     let highlightedBalance = document.createElement("span");
     highlightedBalance.style = "background-color:white;font-weight:bold";
+    highlightedBalance.textContent = player[1]["balance"];
+    playersBalance.appendChild(balanceLabel);
     playersBalance.appendChild(highlightedBalance);
   });
 }
