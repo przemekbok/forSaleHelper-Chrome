@@ -2,7 +2,7 @@
 
 ## About
 
-This is a simple addon for the BGA(https://boardgamearena.com) platform's 'For
+This is a simple addon for the [BGA](https://boardgamearena.com) platform's 'For
 Sale' board game. It counts all harvested cards and current player balance.
 I hope it could work good on your chrome instance beacuse in my case I strugled a lot with implementing a content scripts (for on many layers, like url filter and script implementation).
 

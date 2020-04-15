@@ -1,22 +1,26 @@
 init();
 
 function init() {
-  setTimeout(() => {
-    //vizualize players resources
-    vizualizeResources();
+  if (
+    document.location.origin == "https://boardgamearena.com" &&
+    document.location.pathname.includes(forsale)
+  ) {
+    setTimeout(() => {
+      //vizualize players resources
+      vizualizeResources();
 
-    const config = { attributes: true, childList: true, subtree: true };
-    let coins = document.querySelectorAll("#coinsInHand")[0].textContent;
-    //console.log(`Parsed number of coins: ${coins}`);
-    document.querySelectorAll(".cp_board").forEach((e) => {
-      let observer = new MutationObserver(() => {
-        gameState(coins * 1000);
+      const config = { attributes: true, childList: true, subtree: true };
+      let coins = document.querySelectorAll("#coinsInHand")[0].textContent;
+      //console.log(`Parsed number of coins: ${coins}`);
+      document.querySelectorAll(".cp_board").forEach((e) => {
+        let observer = new MutationObserver(() => {
+          gameState(coins * 1000);
+        });
+        observer.observe(e, config);
       });
-      observer.observe(e, config);
-    });
-  }, 4000);
+    }, 4000);
+  }
 }
-
 function gameState(startCash) {
   let players = {};
 
