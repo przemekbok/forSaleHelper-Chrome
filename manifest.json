@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+  "name": "'For Sale' Helper",
+  "version": "1.0",
+
+  "description": " Helper for board game called 'For Sale' which is available on boardgamearena.com. This version of addon is dedicated for Chrome",
+
+  "icons": {
+    "32": "icons/icon-32.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "css": ["css/css.css"],
+      "js": ["scripts/source.js"]
+    }
+  ],
+
+  "permissions": ["tabs", "activeTab"],
+
+  "browser_action": {
+    "default_icon": "icons/icon-32.png",
+    "default_title": "'For Sale' Helper"
+  }
+}
