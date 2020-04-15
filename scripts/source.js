@@ -1,5 +1,10 @@
 init();
 
+/*todo:
+  -balance on start and on ongoing game -> if ongoing sum players log with current money 
+  -update on log update  rather than on player board update
+*/
+
 function init() {
   if (
     document.location.origin == "https://boardgamearena.com" &&
@@ -54,32 +59,36 @@ function gameState(startCash) {
     });
 
   Object.entries(players).forEach((player) => {
-    // console.log(
-    //   `${player[0]}: cards:<${player[1]["cards"].join(" ")}>, balance:${
-    //     player[1]["balance"]
-    //   }$`
-    // );
     let playersCards = document.querySelector(`.${player[0]}-cards`);
     playersCards.innerHTML = "";
-    let open = document.createElement("span");
-    open.textContent = "cards:< ";
+
+    let open = tagCreator("span", ...new Array(3), "cards:< ");
     playersCards.appendChild(open);
-    player[1]["cards"].sort().forEach((card) => {
-      playersCards.appendChild(colorizeCard(card));
-      let separator = document.createElement("span");
-      separator.textContent = " ";
-      playersCards.appendChild(separator);
-    });
-    let close = document.createElement("span");
-    close.textContent = ">";
+
+    player[1]["cards"]
+      .sort((a, b) => a - b)
+      .forEach((card) => {
+        playersCards.appendChild(colorizeCard(card));
+
+        let separator = tagCreator("span", ...new Array(3), " ");
+        playersCards.appendChild(separator);
+      });
+
+    let close = tagCreator("span", ...new Array(3), ">");
     playersCards.appendChild(close);
+
     let playersBalance = document.querySelector(`.${player[0]}-balance`);
     playersBalance.innerHTML = "";
-    let balanceLabel = document.createElement("span");
-    balanceLabel.textContent = "balance:";
-    let highlightedBalance = document.createElement("span");
-    highlightedBalance.style = "background-color:white;font-weight:bold";
-    highlightedBalance.textContent = player[1]["balance"];
+
+    let balanceLabel = tagCreator("span", ...new Array(3), "balance:");
+
+    let highlightedBalance = tagCreator(
+      "span",
+      ...new Array(2),
+      "background-color:white;font-weight:bold",
+      player[1]["balance"]
+    );
+
     playersBalance.appendChild(balanceLabel);
     playersBalance.appendChild(highlightedBalance);
   });
@@ -87,21 +96,29 @@ function gameState(startCash) {
 
 function vizualizeResources() {
   document.querySelectorAll(".player_board_inner").forEach((e) => {
-    let playerName = e.querySelector(".player-name > a")?.text;
-    let playerResources = document.createElement("div");
-    let cards = document.createElement("div");
-    cards.classList.add(playerName + "-cards");
-    let balance = document.createElement("div");
-    balance.classList.add(playerName + "-balance");
+    const playerName = e.querySelector(".player-name > a")?.text;
+    let playerResources = tagCreator("div");
+
+    let cards = tagCreator("div", `${playerName}-cards`);
+    let balance = tagCreator("div", `${playerName}-balance`);
+
     playerResources.appendChild(cards);
     playerResources.appendChild(balance);
+
     e.appendChild(playerResources);
   });
 }
 
 function colorizeCard(card) {
-  let spanTag = document.createElement("span");
-  spanTag.id = `number-${card}`;
-  spanTag.textContent = card;
-  return spanTag;
+  return tagCreator("span", undefined, `number-${card}`, undefined, card);
+}
+
+function tagCreator(tagType, _class, id, style, text) {
+  let tag = document.createElement(tagType);
+  if (_class) tag.classList.add(_class);
+  if (id) tag.id = id;
+  if (style) tag.style = style;
+  if (text) tag.textContent = text;
+
+  return tag;
 }
