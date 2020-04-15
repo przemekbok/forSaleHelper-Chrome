@@ -1,4 +1,4 @@
-[# Tutorial for addon instalation:](https://www.howtogeek.com/120743/how-to-install-extensions-from-outside-the-chrome-web-store/)
+# [Tutorial for addon instalation](https://www.howtogeek.com/120743/how-to-install-extensions-from-outside-the-chrome-web-store/)
 
 ## About
 
