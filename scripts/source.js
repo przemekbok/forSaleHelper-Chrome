@@ -56,14 +56,22 @@ function gameState(startCash) {
     //   }$`
     // );
     let playersCards = document.querySelector(`.${player[0]}-cards`);
-    playersCards.createTextNode = `cards:<`;
-    player[1]["cards"].map((card) =>
-      playersCards.appendChild(colorizeCard(card))
-    );
-    playersCards.createTextNode = `>`;
-    document.querySelector(
-      `.${player[0]}-balance`
-    ).textContent = `balance:${player[1]["balance"]}$`;
+    playersCards.innerHTML = "";
+    let open = document.createElement("span");
+    open.textContent = "cards:< ";
+    playersCards.appendChild(open);
+    player[1]["cards"].sort().forEach((card) => {
+      playersCards.appendChild(colorizeCard(card));
+      let separator = document.createElement("span");
+      separator.textContent = " ";
+      playersCards.appendChild(separator);
+    });
+    let close = document.createElement("span");
+    close.textContent = ">";
+    playersCards.appendChild(close);
+    let playersBalance = document.querySelector(`.${player[0]}-balance`);
+    let highlightedBalance = document.createElement("span");
+    highlightedBalance.style = "background-color:white;font-weight:bold";
   });
 }
 
