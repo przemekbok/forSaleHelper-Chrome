@@ -3,7 +3,7 @@ init();
 function init() {
   if (
     document.location.origin == "https://boardgamearena.com" &&
-    document.location.pathname.includes(forsale)
+    document.location.pathname.includes("forsale")
   ) {
     setTimeout(() => {
       //vizualize players resources
@@ -76,6 +76,7 @@ function gameState(startCash) {
     let playersBalance = document.querySelector(`.${player[0]}-balance`);
     let highlightedBalance = document.createElement("span");
     highlightedBalance.style = "background-color:white;font-weight:bold";
+    playersBalance.appendChild(highlightedBalance);
   });
 }
 
