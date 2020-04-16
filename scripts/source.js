@@ -1,5 +1,11 @@
 init();
 
+/*
+DA RULEZ:
+-variables and comments named in english language  
+-camelCase
+*/
+
 /*todo:
   -refactor for gameState, it's freakin big!
 */
@@ -17,6 +23,8 @@ function init() {
       const config = { attributes: true, childList: true, subtree: true };
       let coins = getStartingCoins();
       let log = document.querySelector("#logs");
+
+      //set observer to observe logs and update visualizations
       let observer = new MutationObserver(() => {
         gameState(parseInt(coins));
       });
@@ -28,34 +36,67 @@ function gameState(startCash) {
   let players = {};
 
   document.querySelectorAll(".player-name > a").forEach((e) => {
-    players[e.textContent] = { balance: startCash, cards: [] };
+    players[e.textContent.replace(" ", "-")] = {
+      balance: startCash,
+      cards: [],
+    };
   });
 
-  Array.from(document.querySelectorAll("#logs > div > div"))
-    .reverse()
-    .forEach((log) => {
-      if (log.childNodes.length == 4) {
-        let playerName = log.childNodes[1].textContent.replace(" ", "-");
-        if (log.childNodes[3].textContent.match(/\d+ k\$.+\d+$/g)) {
-          //scenariusz kupowania
-          let nums = log.childNodes[3].textContent.match(/\d+/g);
+  players = synchronizeVisualsWithLogs(players);
 
-          players[playerName].balance -= parseInt(nums[0]);
-          players[playerName].cards.push(nums[1]);
-        } else if (
-          log.childNodes[3].textContent.match(/\d+ [^k\$].+\d+ k\$/g)
-        ) {
-          //scenariusz sprzedawania
-          let nums = log.childNodes[3].textContent.match(/\d+/g);
+  updateResourcesVisualization(players);
+  updateDeckVisualization();
+}
 
-          players[playerName].balance += parseInt(nums[1]);
-          players[playerName].cards = players[playerName].cards.filter(
-            (card) => card != nums[0]
-          );
-        }
-      }
-    });
+function getStartingCoins() {
+  let mainPlayerCoins = document.querySelector(".cp_board").children[2]
+    .children[1].textContent;
+  return parseInt(mainPlayerCoins) + getValueFromLog();
+}
 
+function visualizeCardsInDeck() {
+  let whiteboard = document.querySelector("#complete_table > .whiteblock");
+  let visualDeck = tagCreator("div", undefined, "deck-visualization");
+
+  whiteboard.insertBefore(visualDeck, whiteboard.children[0]);
+}
+
+function updateDeckVisualization() {
+  let visualDeck = document.querySelector("#deck-visualization");
+  visualDeck.innerHTML = "";
+  //obtain array with current deck
+  let deck = [...new Array(30).keys()].map((i) => i + 1);
+  let outOfDeck = getValueFromLog("cards").map((card) => parseInt(card));
+
+  let diffrence = deck.filter((crd) => !outOfDeck.includes(crd));
+
+  //convert it to HTML tags
+  diffrence.forEach((card) => {
+    visualDeck.appendChild(colorizeCard(card));
+
+    let separator = tagCreator("span", ...new Array(3), " ");
+    visualDeck.appendChild(separator);
+  });
+}
+
+function visualizeResources() {
+  document.querySelectorAll(".player_board_inner").forEach((e) => {
+    const playerName = e
+      .querySelector(".player-name > a")
+      ?.text.replace(" ", "-");
+    let playerResources = tagCreator("div");
+
+    let cards = tagCreator("div", `${playerName}-cards`);
+    let balance = tagCreator("div", `${playerName}-balance`);
+
+    playerResources.appendChild(cards);
+    playerResources.appendChild(balance);
+
+    e.appendChild(playerResources);
+  });
+}
+
+function updateResourcesVisualization(players) {
   Object.entries(players).forEach((player) => {
     let playersCards = document.querySelector(`.${player[0]}-cards`);
     playersCards.innerHTML = "";
@@ -89,55 +130,6 @@ function gameState(startCash) {
 
     playersBalance.appendChild(balanceLabel);
     playersBalance.appendChild(highlightedBalance);
-
-    updateDeckVisualization();
-  });
-}
-
-function getStartingCoins() {
-  let mainPlayerCoins = document.querySelector(".cp_board").children[2]
-    .children[1].textContent;
-  return parseInt(mainPlayerCoins) + getValueFromLog();
-}
-
-function visualizeCardsInDeck() {
-  let whiteboard = document.querySelector("#complete_table > .whiteblock");
-  let visualDeck = tagCreator("div", undefined, "deck-visualization");
-
-  whiteboard.insertBefore(visualDeck, whiteboard.children[0]);
-}
-
-function updateDeckVisualization() {
-  let visualDeck = document.querySelector("#deck-visualization");
-  visualDeck.innerHTML = "";
-  //obtain array with current deck
-  let deck = [...new Array(30).keys()].map((i) => i + 1);
-  let outOfDeck = getValueFromLog("cards").map((card) => parseInt(card));
-  let diffrence = deck.filter((crd) => !outOfDeck.includes(crd));
-
-  //convert it to HTML tags
-  diffrence.forEach((card) => {
-    visualDeck.appendChild(colorizeCard(card));
-
-    let separator = tagCreator("span", ...new Array(3), " ");
-    visualDeck.appendChild(separator);
-  });
-}
-
-function visualizeResources() {
-  document.querySelectorAll(".player_board_inner").forEach((e) => {
-    const playerName = e
-      .querySelector(".player-name > a")
-      ?.text.replace(" ", "-");
-    let playerResources = tagCreator("div");
-
-    let cards = tagCreator("div", `${playerName}-cards`);
-    let balance = tagCreator("div", `${playerName}-balance`);
-
-    playerResources.appendChild(cards);
-    playerResources.appendChild(balance);
-
-    e.appendChild(playerResources);
   });
 }
 
@@ -148,11 +140,14 @@ function getValueFromLog(value = "coins") {
   if (value == "cards") {
     _switch = 1;
   }
+
+  //getting trade logs
   Array.from(document.querySelectorAll("#logs > div > div"))
     .reverse()
     .forEach((log) => {
       if (log.childNodes.length == 4) {
         let playerName = log.childNodes[1].textContent.replace(" ", "");
+        //it derivates from
         if (log.childNodes[3].textContent.match(/\d+ k\$.+\d+$/g)) {
           let nums = log.childNodes[3].textContent.match(/\d+/g);
 
@@ -170,6 +165,34 @@ function getValueFromLog(value = "coins") {
       }
     });
   return _switch ? cards : parseInt(coins);
+}
+
+function synchronizeVisualsWithLogs(players) {
+  Array.from(document.querySelectorAll("#logs > div > div"))
+    .reverse()
+    .forEach((log) => {
+      if (log.childNodes.length == 4) {
+        let playerName = log.childNodes[1].textContent.replace(" ", "-");
+        if (log.childNodes[3].textContent.match(/\d+ k\$.+\d+$/g)) {
+          //scenariusz kupowania
+          let nums = log.childNodes[3].textContent.match(/\d+/g);
+
+          players[playerName].balance -= parseInt(nums[0]);
+          players[playerName].cards.push(nums[1]);
+        } else if (
+          log.childNodes[3].textContent.match(/\d+ [^k\$].+\d+ k\$/g)
+        ) {
+          //scenariusz sprzedawania
+          let nums = log.childNodes[3].textContent.match(/\d+/g);
+
+          players[playerName].balance += parseInt(nums[1]);
+          players[playerName].cards = players[playerName].cards.filter(
+            (card) => card != nums[0]
+          );
+        }
+      }
+    });
+  return players;
 }
 
 function colorizeCard(card) {
