@@ -7,7 +7,7 @@ DA RULEZ:
 */
 
 /*todo:
-  -refactor for gameState, it's freakin big!
+  -remaining cards section need some kind of update card update
 */
 
 function init() {
@@ -57,13 +57,20 @@ function getStartingCoins() {
 function visualizeCardsInDeck() {
   let whiteboard = document.querySelector("#complete_table > .whiteblock");
   let visualDeck = tagCreator("div", undefined, "deck-visualization");
-
   whiteboard.insertBefore(visualDeck, whiteboard.children[0]);
 }
 
 function updateDeckVisualization() {
   let visualDeck = document.querySelector("#deck-visualization");
   visualDeck.innerHTML = "";
+  //label
+  let aboutDeck = tagCreator(
+    "span",
+    ...new Array(2),
+    "font-weight:bold",
+    "Remaining cards: "
+  );
+  visualDeck.appendChild(aboutDeck);
   //obtain array with current deck
   let deck = [...new Array(30).keys()].map((i) => i + 1);
   let outOfDeck = getValueFromLog("cards").map((card) => parseInt(card));
