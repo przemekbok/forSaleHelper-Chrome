@@ -1,6 +1,7 @@
 # [Tutorial for how to add an addon to Chrome](https://developer.chrome.com/extensions/getstarted#manifest/)
 
 ![addon in game preview](https://github.com/przemekbok/forSaleHelper-Chrome/blob/master/promo.png)
+![addon in game preview 2](https://github.com/przemekbok/forSaleHelper-Chrome/blob/master/promo2.png)
 
 ## About
 
