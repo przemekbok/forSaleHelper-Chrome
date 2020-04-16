@@ -80,7 +80,6 @@ function updateDeckVisualization() {
   let cardsOnTheTable = gameui.tableCardsStock.items.map(
     (e) => parseInt(e["type"]) + 1
   );
-  console.log(cardsOnTheTable);
   let diffrence = deck.filter(
     (crd) => !outOfDeck.includes(crd) && !cardsOnTheTable.includes(crd)
   );
