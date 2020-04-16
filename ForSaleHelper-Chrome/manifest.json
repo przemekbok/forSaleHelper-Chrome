@@ -13,9 +13,11 @@
     {
       "matches": ["*://boardgamearena.com/*", "*://*.boardgamearena.com/*"],
       "css": ["css/css.css"],
-      "js": ["scripts/source.js"]
+      "js": ["scripts/inject.js"]
     }
   ],
+
+  "web_accessible_resources": ["scripts/source.js"],
 
   "permissions": ["tabs", "activeTab"],
 

@@ -1,36 +1,34 @@
-init();
+setTimeout(() => {
+  init();
+}, 4000);
 
 /*
-DA RULEZ:
--variables and comments named in english language  
+DA RULES:
+-variables and comments named in english language
 -camelCase
 */
 
 /*todo:
-  -remaining cards section need some kind of update for cards that are placed on table
-*/
+ */
 
 function init() {
   if (
     document.location.origin == "https://boardgamearena.com" &&
     document.location.pathname.includes("forsale")
   ) {
-    //we are waiting for an app to fully load
-    setTimeout(() => {
-      //vizualize players resources
-      visualizePlayersResources();
-      visualizeCardsInDeck();
+    //vizualize players resources
+    visualizePlayersResources();
+    visualizeCardsInDeck();
 
-      const config = { attributes: true, childList: true, subtree: true };
-      let coins = getStartingCoins();
-      let log = document.querySelector("#logs");
+    const config = { attributes: true, childList: true, subtree: true };
+    let coins = getStartingCoins();
+    let log = document.querySelector("#logs");
 
-      //set observer to observe logs and update visualizations
-      let logObserver = new MutationObserver(() => {
-        updateVisualization(parseInt(coins));
-      });
-      logObserver.observe(log, config);
-    }, 4000);
+    //set observer to observe logs and update visualizations
+    let logObserver = new MutationObserver(() => {
+      updateVisualization(parseInt(coins));
+    });
+    logObserver.observe(log, config);
   }
 }
 
@@ -76,13 +74,18 @@ function updateDeckVisualization() {
   );
 
   visualDeck.appendChild(aboutDeck);
-  //obtain array with current deck
+  //-obtain array with current deck
   let deck = [...new Array(30).keys()].map((i) => i + 1);
   let outOfDeck = getValueFromLog("cards").map((card) => parseInt(card));
+  let cardsOnTheTable = gameui.tableCardsStock.items.map(
+    (e) => parseInt(e["type"]) + 1
+  );
+  console.log(cardsOnTheTable);
+  let diffrence = deck.filter(
+    (crd) => !outOfDeck.includes(crd) && !cardsOnTheTable.includes(crd)
+  );
 
-  let diffrence = deck.filter((crd) => !outOfDeck.includes(crd));
-
-  //convert it to HTML tags
+  //-convert it to HTML tags
   diffrence.forEach((card) => {
     visualDeck.appendChild(colorizeCard(card));
 
