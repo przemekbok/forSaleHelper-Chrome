@@ -1,5 +1,7 @@
 # [Tutorial for addon instalation](https://www.howtogeek.com/120743/how-to-install-extensions-from-outside-the-chrome-web-store/)
 
+![addon in game preview](https://github.com/przemekbok/forSaleHelper-Chrome/blob/master/promo.png)
+
 ## About
 
 This is a simple addon for the [BGA](https://boardgamearena.com) platform's 'For
