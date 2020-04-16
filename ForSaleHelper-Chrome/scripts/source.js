@@ -53,7 +53,7 @@ function updateVisualization(startCash) {
 function getStartingCoins() {
   let mainPlayerCoins = document.querySelector(".cp_board").children[2]
     .children[1].textContent;
-  return parseInt(mainPlayerCoins) + getValueFromLog();
+  return parseInt(mainPlayerCoins) + getValueFromLog("playerSpentCoins");
 }
 
 function visualizeCardsInDeck() {
@@ -64,14 +64,17 @@ function visualizeCardsInDeck() {
 
 function updateDeckVisualization() {
   let visualDeck = document.querySelector("#deck-visualization");
+  //sweeping old visualization
   visualDeck.innerHTML = "";
-  //label
+  //building visualization for cards storedin deck
+  //---------
   let aboutDeck = tagCreator(
     "span",
     ...new Array(2),
     "font-weight:bold",
     "Remaining cards: "
   );
+
   visualDeck.appendChild(aboutDeck);
   //obtain array with current deck
   let deck = [...new Array(30).keys()].map((i) => i + 1);
@@ -86,6 +89,7 @@ function updateDeckVisualization() {
     let separator = tagCreator("span", ...new Array(3), " ");
     visualDeck.appendChild(separator);
   });
+  //---------
 }
 
 function visualizePlayersResources() {
@@ -106,10 +110,14 @@ function visualizePlayersResources() {
 }
 
 function updateResourcesVisualization(players) {
+  //this code visualizes gathered card for each player
   Object.entries(players).forEach((player) => {
     let playersCards = document.querySelector(`#player-${player[0]}-cards`);
+    //sweeping old visualization
     playersCards.innerHTML = "";
 
+    //building visualization for one of the player's gathered cards
+    //---------
     let open = tagCreator("span", ...new Array(3), "cards:< ");
     playersCards.appendChild(open);
 
@@ -124,10 +132,14 @@ function updateResourcesVisualization(players) {
 
     let close = tagCreator("span", ...new Array(3), ">");
     playersCards.appendChild(close);
+    //---------
 
     let playersBalance = document.querySelector(`#player-${player[0]}-balance`);
+    //sweeping old visualization
     playersBalance.innerHTML = "";
 
+    //building visualization for one of the player's balance
+    //---------
     let balanceLabel = tagCreator("span", ...new Array(3), "balance:");
 
     let highlightedBalance = tagCreator(
@@ -136,13 +148,14 @@ function updateResourcesVisualization(players) {
       "background-color:white;font-weight:bold",
       `${player[1]["balance"]} k$`
     );
+    //---------
 
     playersBalance.appendChild(balanceLabel);
     playersBalance.appendChild(highlightedBalance);
   });
 }
 
-function getValueFromLog(value = "coins") {
+function getValueFromLog(value = "playerSpentCoins") {
   let _switch = 0;
   let coins = 0;
   let cards = [];
@@ -150,17 +163,18 @@ function getValueFromLog(value = "coins") {
     _switch = 1;
   }
 
-  //getting trade logs
+  // this code gets buying scenario logs from phase 1
   Array.from(document.querySelectorAll("#logs > div > div"))
     .reverse()
     .forEach((log) => {
       if (log.childNodes.length == 4) {
         let playerName = log.childNodes[1].textContent.replace(" ", "");
-        //it derivates from
+        //this Regex maches only phrase 1 logs
         if (log.childNodes[3].textContent.match(/\d+ k\$.+\d+$/g)) {
           let nums = log.childNodes[3].textContent.match(/\d+/g);
 
           if (!_switch) {
+            //in the "playerSpentCoins" case we are gathering logs only for main player spend funds
             let mainPlayerName = document
               .querySelector(".player_board_inner > .player-name > a")
               ?.text.replace(" ", "");
@@ -168,6 +182,7 @@ function getValueFromLog(value = "coins") {
               coins += parseInt(nums[0]);
             }
           } else if (_switch) {
+            // for the "cards" case we're gathering all cards drawn from deck
             cards.push(nums[1]);
           }
         }
@@ -177,13 +192,14 @@ function getValueFromLog(value = "coins") {
 }
 
 function getPlayersStateFromLogs(players) {
+  //this code is dedicated to gathering logs from phase 1 and 2
   Array.from(document.querySelectorAll("#logs > div > div"))
     .reverse()
     .forEach((log) => {
       if (log.childNodes.length == 4) {
         let playerName = log.childNodes[1].textContent.replace(" ", "-");
         if (log.childNodes[3].textContent.match(/\d+ k\$.+\d+$/g)) {
-          //scenariusz kupowania
+          //buying scenario
           let nums = log.childNodes[3].textContent.match(/\d+/g);
 
           players[playerName].balance -= parseInt(nums[0]);
@@ -191,7 +207,7 @@ function getPlayersStateFromLogs(players) {
         } else if (
           log.childNodes[3].textContent.match(/\d+ [^k\$].+\d+ k\$/g)
         ) {
-          //scenariusz sprzedawania
+          //selling scenario
           let nums = log.childNodes[3].textContent.match(/\d+/g);
 
           players[playerName].balance += parseInt(nums[1]);
