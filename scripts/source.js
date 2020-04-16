@@ -2,8 +2,6 @@ init();
 
 /*todo:
   -refactor for gameState, it's freakin big!
-  -update on log update  rather than on player board update
-  -cardsInDeck visualization
 */
 
 function init() {
@@ -14,16 +12,15 @@ function init() {
     setTimeout(() => {
       //vizualize players resources
       visualizeResources();
+      visualizeCardsInDeck();
 
       const config = { attributes: true, childList: true, subtree: true };
-      let coins = getStartingCoins(); //document.querySelectorAll("#coinsInHand")[0].textContent;
-      //console.log(`Parsed number of coins: ${coins}`);
-      document.querySelectorAll(".cp_board").forEach((e) => {
-        let observer = new MutationObserver(() => {
-          gameState(coins * 1);
-        });
-        observer.observe(e, config);
+      let coins = getStartingCoins();
+      let log = document.querySelector("#logs");
+      let observer = new MutationObserver(() => {
+        gameState(parseInt(coins));
       });
+      observer.observe(log, config);
     }, 4000);
   }
 }
@@ -51,7 +48,6 @@ function gameState(startCash) {
           //scenariusz sprzedawania
           let nums = log.childNodes[3].textContent.match(/\d+/g);
 
-          console.log(typeof players[playerName].balance);
           players[playerName].balance += parseInt(nums[1]);
           players[playerName].cards = players[playerName].cards.filter(
             (card) => card != nums[0]
@@ -93,37 +89,46 @@ function gameState(startCash) {
 
     playersBalance.appendChild(balanceLabel);
     playersBalance.appendChild(highlightedBalance);
+
+    updateDeckVisualization();
   });
 }
 
 function getStartingCoins() {
   let mainPlayerCoins = document.querySelector(".cp_board").children[2]
     .children[1].textContent;
-  let mainPlayerName = document.querySelector(
-    ".player_board_inner > .player-name > a"
-  )?.text;
-  Array.from(document.querySelectorAll("#logs > div > div"))
-    .reverse()
-    .forEach((log) => {
-      if (log.childNodes.length == 4) {
-        let playerName = log.childNodes[1].textContent.replace(" ", "-");
-        if (
-          playerName == mainPlayerName &&
-          log.childNodes[3].textContent.match(/\d+ k\$.+\d+$/g)
-        ) {
-          let nums = log.childNodes[3].textContent.match(/\d+/g);
-          mainPlayerCoins += nums[0] * 1;
-        }
-      }
-    });
-  return mainPlayerCoins;
+  return parseInt(mainPlayerCoins) + getValueFromLog();
 }
 
-function visualizeInDeck() {}
+function visualizeCardsInDeck() {
+  let whiteboard = document.querySelector("#complete_table > .whiteblock");
+  let visualDeck = tagCreator("div", undefined, "deck-visualization");
+
+  whiteboard.insertBefore(visualDeck, whiteboard.children[0]);
+}
+
+function updateDeckVisualization() {
+  let visualDeck = document.querySelector("#deck-visualization");
+  visualDeck.innerHTML = "";
+  //obtain array with current deck
+  let deck = [...new Array(30).keys()].map((i) => i + 1);
+  let outOfDeck = getValueFromLog("cards").map((card) => parseInt(card));
+  let diffrence = deck.filter((crd) => !outOfDeck.includes(crd));
+
+  //convert it to HTML tags
+  diffrence.forEach((card) => {
+    visualDeck.appendChild(colorizeCard(card));
+
+    let separator = tagCreator("span", ...new Array(3), " ");
+    visualDeck.appendChild(separator);
+  });
+}
 
 function visualizeResources() {
   document.querySelectorAll(".player_board_inner").forEach((e) => {
-    const playerName = e.querySelector(".player-name > a")?.text;
+    const playerName = e
+      .querySelector(".player-name > a")
+      ?.text.replace(" ", "-");
     let playerResources = tagCreator("div");
 
     let cards = tagCreator("div", `${playerName}-cards`);
@@ -134,6 +139,37 @@ function visualizeResources() {
 
     e.appendChild(playerResources);
   });
+}
+
+function getValueFromLog(value = "coins") {
+  let _switch = 0;
+  let coins = 0;
+  let cards = [];
+  if (value == "cards") {
+    _switch = 1;
+  }
+  Array.from(document.querySelectorAll("#logs > div > div"))
+    .reverse()
+    .forEach((log) => {
+      if (log.childNodes.length == 4) {
+        let playerName = log.childNodes[1].textContent.replace(" ", "");
+        if (log.childNodes[3].textContent.match(/\d+ k\$.+\d+$/g)) {
+          let nums = log.childNodes[3].textContent.match(/\d+/g);
+
+          if (!_switch) {
+            let mainPlayerName = document
+              .querySelector(".player_board_inner > .player-name > a")
+              ?.text.replace(" ", "");
+            if (playerName == mainPlayerName) {
+              coins += parseInt(nums[0]);
+            }
+          } else if (_switch) {
+            cards.push(nums[1]);
+          }
+        }
+      }
+    });
+  return _switch ? cards : parseInt(coins);
 }
 
 function colorizeCard(card) {
