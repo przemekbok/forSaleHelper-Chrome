@@ -93,8 +93,8 @@ function visualizeResources() {
       ?.text.replace(" ", "-");
     let playerResources = tagCreator("div");
 
-    let cards = tagCreator("div", `${playerName}-cards`);
-    let balance = tagCreator("div", `${playerName}-balance`);
+    let cards = tagCreator("div", undefined, `player-${playerName}-cards`);
+    let balance = tagCreator("div", undefined, `player-${playerName}-balance`);
 
     playerResources.appendChild(cards);
     playerResources.appendChild(balance);
@@ -105,7 +105,7 @@ function visualizeResources() {
 
 function updateResourcesVisualization(players) {
   Object.entries(players).forEach((player) => {
-    let playersCards = document.querySelector(`.${player[0]}-cards`);
+    let playersCards = document.querySelector(`#player-${player[0]}-cards`);
     playersCards.innerHTML = "";
 
     let open = tagCreator("span", ...new Array(3), "cards:< ");
@@ -123,7 +123,7 @@ function updateResourcesVisualization(players) {
     let close = tagCreator("span", ...new Array(3), ">");
     playersCards.appendChild(close);
 
-    let playersBalance = document.querySelector(`.${player[0]}-balance`);
+    let playersBalance = document.querySelector(`#player-${player[0]}-balance`);
     playersBalance.innerHTML = "";
 
     let balanceLabel = tagCreator("span", ...new Array(3), "balance:");
