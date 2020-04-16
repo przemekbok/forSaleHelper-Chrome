@@ -7,7 +7,7 @@ DA RULEZ:
 */
 
 /*todo:
-  -remaining cards section need some kind of update card update
+  -remaining cards section need some kind of update for cards that are placed on table
 */
 
 function init() {
@@ -15,9 +15,10 @@ function init() {
     document.location.origin == "https://boardgamearena.com" &&
     document.location.pathname.includes("forsale")
   ) {
+    //we are waiting for an app to fully load
     setTimeout(() => {
       //vizualize players resources
-      visualizeResources();
+      visualizePlayersResources();
       visualizeCardsInDeck();
 
       const config = { attributes: true, childList: true, subtree: true };
@@ -25,14 +26,15 @@ function init() {
       let log = document.querySelector("#logs");
 
       //set observer to observe logs and update visualizations
-      let observer = new MutationObserver(() => {
-        gameState(parseInt(coins));
+      let logObserver = new MutationObserver(() => {
+        updateVisualization(parseInt(coins));
       });
-      observer.observe(log, config);
+      logObserver.observe(log, config);
     }, 4000);
   }
 }
-function gameState(startCash) {
+
+function updateVisualization(startCash) {
   let players = {};
 
   document.querySelectorAll(".player-name > a").forEach((e) => {
@@ -42,7 +44,7 @@ function gameState(startCash) {
     };
   });
 
-  players = synchronizeVisualsWithLogs(players);
+  players = getPlayersStateFromLogs(players);
 
   updateResourcesVisualization(players);
   updateDeckVisualization();
@@ -86,7 +88,7 @@ function updateDeckVisualization() {
   });
 }
 
-function visualizeResources() {
+function visualizePlayersResources() {
   document.querySelectorAll(".player_board_inner").forEach((e) => {
     const playerName = e
       .querySelector(".player-name > a")
@@ -174,7 +176,7 @@ function getValueFromLog(value = "coins") {
   return _switch ? cards : parseInt(coins);
 }
 
-function synchronizeVisualsWithLogs(players) {
+function getPlayersStateFromLogs(players) {
   Array.from(document.querySelectorAll("#logs > div > div"))
     .reverse()
     .forEach((log) => {
