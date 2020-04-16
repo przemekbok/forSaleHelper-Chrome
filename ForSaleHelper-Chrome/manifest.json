@@ -3,7 +3,7 @@
   "name": "'For Sale' Helper",
   "version": "1.0",
 
-  "description": "Helper for board game called 'For Sale' which is available on boardgamearena.com. This version of addon is dedicated for Chrome",
+  "description": "Helper for board game called 'For Sale' which is available on boardgamearena.com. This version of addon is dedicated for Chrome browser",
 
   "icons": {
     "32": "icons/icon-32.png"
